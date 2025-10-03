@@ -3,6 +3,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { FaStar, FaMapMarkerAlt, FaGithub, FaLinkedin } from "react-icons/fa";
+import { format } from 'date-fns'; 
+
+const ReviewCard = ({ review }) => (
+    <div className="bg-gray-50 border border-gray-200 p-4 rounded-lg">
+        <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+                <FaUserCircle className="text-gray-400" />
+                <p className="font-semibold text-gray-800">{review.reviewerName}</p>
+            </div>
+            <div className="flex items-center">
+                {[...Array(5)].map((_, i) => (
+                    <FaStar key={i} className={i < review.rating ? 'text-yellow-400' : 'text-gray-300'} />
+                ))}
+            </div>
+        </div>
+        {review.comment && <p className="text-gray-600 text-sm mb-2 italic">"{review.comment}"</p>}
+        <p className="text-xs text-gray-400 text-right">{format(new Date(review.createdAt), 'PPP')}</p>
+    </div>
+);
 
 export default function UserProfilePage() {
   const { userId } = useParams(); 

@@ -40,6 +40,11 @@ const UserSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'user',
+  },
   password: {
     type: String,
     required: true,
@@ -93,7 +98,6 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 1,
   },
-  // This will store a list of achievements the user has earned
   unlockedAchievements: [{
     achievementId: { type: String, required: true },
     unlockedAt: { type: Date, default: Date.now }
@@ -101,7 +105,6 @@ const UserSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-// A virtual property to calculate average rating on the fly
 UserSchema.virtual('averageRating').get(function() {
     if (!this.reviews || this.reviews.length === 0) {
     return 0;

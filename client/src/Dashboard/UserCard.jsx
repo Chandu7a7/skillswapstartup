@@ -1,10 +1,17 @@
 // client/src/Dashboard/UserCard.jsx
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link } from 'react-router-dom';
 import {  FaMapMarkerAlt, FaGithub, FaLinkedin } from "react-icons/fa";
+import { AuthContext } from '../context/AuthContext';
+
 
 export default function UserCard({ user, onOpenModal }) {
+  
+   const { onlineUsers } = useContext(AuthContext);
+   const isOnline = onlineUsers.includes(user.id);
+
+
   return (
     <div className="bg-white text-gray-800 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200 flex flex-col h-full hover:-translate-y-1">
       <div className="flex-grow">

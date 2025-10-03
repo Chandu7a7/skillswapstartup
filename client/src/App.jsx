@@ -26,7 +26,8 @@ import Schedule from "./Dashboard/Schedule";
 import ProfilePage from './pages/ProfilePage'; 
 import SwapDetailsPage from './Dashboard/SwapDetailsPage';
 import SearchResultsPage from './Dashboard/SearchResultsPage';
-
+import AdminRoute from './components/AdminRoute';
+import AdminDashboard from './admin/AdminDashboard';
 
 function App() {
   return (
@@ -57,7 +58,12 @@ function App() {
           <Route path="schedule" element={<Schedule />} />
         </Route>
       </Route>
-
+       {/* --- NEW: Protected ADMIN Dashboard Routes --- */}
+      <Route element={<AdminRoute />}>
+        {/* You can create an <AdminLayout /> if you want a different sidebar */}
+        <Route path="/admin" element={<AdminDashboard />} />
+        {/* Add other admin pages here, e.g., /admin/users */}
+      </Route>
       <Route path="*" element={<h1 className="text-center pt-20">404: Page Not Found</h1>} />
     </Routes>
   );

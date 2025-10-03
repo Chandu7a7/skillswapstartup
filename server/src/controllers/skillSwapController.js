@@ -3,7 +3,7 @@
 import SkillSwap from '../models/SkillSwapModel.js';
 import User from '../models/UserModel.js';
 import { checkAchievements } from '../services/achievementService.js';
-
+import { sendEmail } from '../services/emailService.js';
 
 //----------------------- Create new Swap loged in user  -----------------------
 
@@ -34,6 +34,21 @@ export const createSwapRequest = async (req, res) => {
     });
 
     const savedSwap = await newSwap.save();
+     const receiver = await User.findById(savedSwap.receiver);
+
+      if (receiver && receiver.email) {
+      await sendEmail({
+        to: receiver.email,
+        subject: 'You have a new Skill Swap request!',
+        text: `Hi ${receiver.name}, ${req.user.name} has sent you a request to swap skills. Log in to your SkillSwap account to respond.`,
+        html: `
+          <h1>New Skill Swap Request!</h1>
+          <p>Hi ${receiver.name},</p>
+          <p><strong>${req.user.name}</strong> has sent you a request to learn <strong>${savedSwap.skillWanted}</strong> in exchange for <strong>${savedSwap.skillOffered}</strong>.</p>
+          <p>Log in to your SkillSwap account to accept or decline the request.</p>
+        `
+      });
+    }
     
     // --- THIS IS THE NEW REAL-TIME NOTIFICATION PART ---
     // 1. Get the real-time server objects from the request

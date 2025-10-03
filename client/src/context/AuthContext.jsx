@@ -8,6 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [unreadRequestCount, setUnreadRequestCount] = useState(0);
+  const [onlineUsers, setOnlineUsers] = useState([]);
+
 
   useEffect(() => {
     try {
@@ -71,7 +73,12 @@ export const AuthProvider = ({ children }) => {
   }, [user, fetchUnreadCount, fetchUnreadRequestCount]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, unreadCount, fetchUnreadCount, unreadRequestCount, fetchUnreadRequestCount }}>
+    <AuthContext.Provider value={{ 
+      user, login, logout, loading, 
+      unreadCount, fetchUnreadCount, 
+      unreadRequestCount, fetchUnreadRequestCount,
+      onlineUsers, setOnlineUsers 
+    }}>
       {!loading && children}
     </AuthContext.Provider>
   );

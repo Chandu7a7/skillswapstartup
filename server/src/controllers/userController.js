@@ -5,58 +5,60 @@ import DatauriParser from 'datauri/parser.js'; // 2. Import DataURI
 import path from 'path';
 
  // -------------------------------- Get All user Dashboard-------------------------------
+
+
+
 export const getAllUsers = async (req, res) => {
   try {
     const loggedInUserId = req.user.id;
-    const { skillsWanted: loggedInUserSkillsWanted } = req.user;
+    
+    // 1. Get filter and pagination options from the URL query
+    const { location, availability, skillsOffered, page = 1, limit = 15 } = req.query;
 
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 15;
-    const skip = (page - 1) * limit;
+    // 2. Build the base query object
+    const query = { _id: { $ne: loggedInUserId } };
 
-    let users;
-    let totalUsers;
-
-    if (loggedInUserSkillsWanted && loggedInUserSkillsWanted.length > 0) {
-      const matchQuery = {
-        skillsOffered: { $in: loggedInUserSkillsWanted },
-        _id: { $ne: loggedInUserId }
-      };
-      
-      totalUsers = await User.countDocuments(matchQuery);
-      users = await User.find(matchQuery)
-        .select('-password')
-        .sort({ createdAt: -1 }) 
-        .limit(limit)
-        .skip(skip);
+    // 3. Dynamically add filters to the query if they exist
+    if (location) {
+      query.location = new RegExp(location, 'i'); // Case-insensitive search
     }
-
-    if (!users || users.length === 0) {
-      console.log("No specific matches found. Falling back to showing all users.");
-      const allUsersQuery = { _id: { $ne: loggedInUserId } };
-      totalUsers = await User.countDocuments(allUsersQuery);
-      users = await User.find(allUsersQuery)
-        .select('-password')
-        .sort({ createdAt: -1 })
-        .limit(limit)
-        .skip(skip);
+    if (availability) {
+      query.availability = availability;
     }
+    if (skillsOffered) {
+      query.skillsOffered = new RegExp(skillsOffered, 'i');
+    }
+    
+    const pageNum = parseInt(page, 10);
+    const limitNum = parseInt(limit, 10);
+    const skip = (pageNum - 1) * limitNum;
+
+    // 4. Get the total count for the filtered query
+    const totalUsers = await User.countDocuments(query);
+
+    // 5. Find the users using the combined query with pagination
+    const users = await User.find(query)
+      .select('-password')
+      .sort({ createdAt: -1 })
+      .limit(limitNum)
+      .skip(skip);
 
     res.status(200).json({
       success: true,
       count: users.length,
       data: users,
       pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(totalUsers / limit),
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalUsers / limitNum),
       }
     });
-
   } catch (error) {
     console.error("Error in getAllUsers:", error);
     res.status(500).json({ success: false, message: 'Server Error' });
   }
 };
+
+// ... (The rest of your userController is the same)
 
 
 // ----------------------------------Get UserByID-------------------------------

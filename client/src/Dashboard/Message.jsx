@@ -1,6 +1,5 @@
 // client/src/Dashboard/Messages.jsx
 
-// FIX 1: 'useMemo' moved inside the curly braces
 import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { Send, Image, Video, Paperclip, Search, Menu } from "lucide-react";
 import { AuthContext } from "../context/AuthContext";
@@ -16,7 +15,8 @@ export default function Messages() {
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const { user: loggedInUser ,fetchUnreadCount  } = useContext(AuthContext);
+  
+  const { user: loggedInUser, fetchUnreadCount, onlineUsers } = useContext(AuthContext);
 
   
   const socket = useRef(null);
@@ -157,7 +157,7 @@ export default function Messages() {
   return (
     <div className="flex h-[calc(100vh_-_8rem)] bg-white pt-12 rounded-lg overflow-hidden border">
       {/* Sidebar */}
-      <div className={`border-r flex flex-col transition-transform duration-300 ease-in-out w-full md:w-1/3 lg:w-1/4 md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0 absolute z-20 bg-white' : '-translate-x-full absolute'}`}>
+     <div className={`border-r flex flex-col transition-transform duration-300 ease-in-out w-full md:w-1/3 lg:w-1/4 md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0 absolute z-20 bg-white' : '-translate-x-full absolute'}`}>
         <div className="p-4 border-b flex items-center bg-gray-50 gap-2">
           <Search className="text-gray-400" size={20} />
           <input type="text" placeholder="Search conversations..." className="w-full text-sm bg-transparent focus:outline-none" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
@@ -167,24 +167,23 @@ export default function Messages() {
             const otherUser = getOtherUser(c);
             if (!otherUser) return null;
 
+            // This line now works correctly
+            const isOnline = onlineUsers.includes(otherUser._id);
             const unreadCount = c.unreadCounts[loggedInUser.id] || 0;
 
             return (
-              <div key={c._id} onClick={() => handleConversationClick(c)} 
-              className={`p-3 cursor-pointer rounded-lg transition flex items-center gap-3 
-              ${activeChat?._id === c._id ? "bg-blue-100" : "hover:bg-gray-100"}`
-              }>
-
+              <div key={c._id} onClick={() => handleConversationClick(c)} className={`p-3 cursor-pointer rounded-lg transition flex items-center gap-3 ${activeChat?._id === c._id ? "bg-blue-100" : "hover:bg-gray-100"}`}>
                 <div className="relative">
                   <img src={otherUser.profilePicture || `https://ui-avatars.com/api/?name=${otherUser.name}`} alt={otherUser.name} className="w-12 h-12 rounded-full object-cover" />
-                  {unreadCount > 0 && <span className="absolute top-0 right-0 w-3 h-3 bg-blue-500 rounded-full border-2 border-white"></span>}
+                  {/* The green dot will now appear correctly */}
+                  {/* {isOnline && <span className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white"></span>} */}
                 </div>
                 <div className="flex-1 overflow-hidden">
-                  <div className="flex justify-between items-center">
-                    <h4 className={`font-semibold text-sm truncate ${unreadCount > 0 ? 'font-bold' : ''}`}>{otherUser.name}</h4>
-                    {c.lastMessageAt && <span className="text-xs text-gray-500 flex-shrink-0">{formatDistanceToNow(new Date(c.lastMessageAt), { addSuffix: true })}</span>}
-                  </div>
-                  <p className={`text-sm truncate ${unreadCount > 0 ? 'text-gray-800 font-semibold' : 'text-gray-600'}`}>{c.lastMessage}</p>
+                    <div className="flex justify-between items-center">
+                        <h4 className={`font-semibold text-sm truncate ${unreadCount > 0 ? 'font-bold' : ''}`}>{otherUser.name}</h4>
+                        {c.lastMessageAt && <span className="text-xs text-gray-500 flex-shrink-0">{formatDistanceToNow(new Date(c.lastMessageAt), { addSuffix: true })}</span>}
+                    </div>
+                    <p className={`text-sm truncate ${unreadCount > 0 ? 'text-gray-800 font-semibold' : 'text-gray-600'}`}>{c.lastMessage}</p>
                 </div>
               </div>
             )

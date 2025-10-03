@@ -10,7 +10,7 @@ import logo from '../assids/Skillswap-logo.png';
 export default function DashboardNavbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const { user, logout, unreadCount,unreadRequestCount  } = useContext(AuthContext);
+  const { user, logout, unreadCount, unreadRequestCount } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const dropdownRef = useRef(null);
@@ -103,15 +103,15 @@ export default function DashboardNavbar() {
             )}
           </Link>
 
-<Link to="/dashboard/my-matches" className="relative">
-                    <FaBell className="text-gray-700 cursor-pointer text-xl hover:text-blue-600 transition" />
-                    {unreadRequestCount > 0 && (
-                        <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                            {unreadRequestCount}
-                        </span>
-                    )}
-                </Link>
-                
+          <Link to="/dashboard/my-matches" className="relative">
+            <FaBell className="text-gray-700 cursor-pointer text-xl hover:text-blue-600 transition" />
+            {unreadRequestCount > 0 && (
+              <span className="absolute -top-1 -right-2 bg-red-500 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                {unreadRequestCount}
+              </span>
+            )}
+          </Link>
+
           {user && (
             <div className="relative" ref={dropdownRef}>
               <div
@@ -151,6 +151,16 @@ export default function DashboardNavbar() {
                         {item.name}
                       </NavLink>
                     ))}
+
+                    {user && user.role === 'admin' && (
+                      <NavLink
+                        to="/admin"
+                        className={`${navLinkStyles} bg-gray-100 font-bold`}
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        Admin Panel
+                      </NavLink>
+                    )}
                   </div>
                   <button
                     onClick={handleLogout}
