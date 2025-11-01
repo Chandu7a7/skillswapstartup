@@ -51,7 +51,8 @@ const io = new Server(httpServer, {
 dbConnect();
 
 // --- MIDDLEWARE SETUP ---
-app.use(cors({ origin: 'https://skillswapstartup.vercel.app', 
+app.use(cors({ 
+origin: 'https://skillswapstartup.vercel.app', 
 credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
